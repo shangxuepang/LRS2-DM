@@ -22,7 +22,7 @@ To mitigate resolution limitations, the method incorporates cognitive-conditione
 
 
 <p align="center">
-  <img src="detection.png" width="90%"/>
+  <img src="detection.jpg" width="90%"/>
 </p>
 
 📭 Contact
