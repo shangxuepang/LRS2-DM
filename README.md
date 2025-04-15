@@ -1,7 +1,7 @@
 # LRS2-DM
 The study focuses on addressing the challenge of small object detection in low-resolution remote sensing imagery. 
 
-# 🚢 Small Object Detection in Low-Resolution Remote Sensing Imagery
+# 🚢 LRS2-DM: Small Ship Target Detection in Low-Resolution Remote Sensing Images Based on Diffusion Models
 
 <p align="center">
   <img src="LRS2-DM.png." width="90%"/>
