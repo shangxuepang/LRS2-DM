@@ -9,7 +9,7 @@ The study focuses on addressing the challenge of small object detection in low-r
 
 ## 📌 Introduction
 
-This project implements the core methodology from our research on small object detection in low-resolution remote sensing imagery. Our approach addresses the inherent challenges posed by limited resolution, particularly for tiny targets such as ships in complex scenes.
+To mitigate resolution limitations, the method incorporates cognitive-conditioned input and a low-level super-resolution module to generate reference images as auxiliary guidance. This enhances the quality of the super-resolved outputs. Additionally, to compensate for the loss of fine details in small targets, a spatial refinement module is employed. This module sharpens object-level features and improves the accuracy of ship detection in remote sensing scenes.
 
 ## 🧠 Key Contributions
 
@@ -18,15 +18,12 @@ This project implements the core methodology from our research on small object d
 - **Spatial Refinement Module (SRM):** Sharpens object-level features and enhances small object detection accuracy by refining spatial details.
 - **Multi-Loss Design:** Introduces a joint loss for diffusion model training and detection head regularization (L<sub>DM</sub> + L<sub>reg</sub>).
 
-## 📊 Framework Overview
+## 📊 Result
 
-The architecture is divided into three main components:
-
-1. **CCI:** Embeds class and location semantics to enhance the input conditions.
-2. **L²SR:** Enhances image resolution with generative priors.
-3. **SRM:** Refines spatial features for accurate object localization and classification.
 
 <p align="center">
-  <img src="LRS2-DM.png" width="90%"/>
+  <img src="detection.png" width="90%"/>
 </p>
 
+📭 Contact
+If your have any comments or questions, feel free to contact chenyantong@dlmu.edu.cn.
