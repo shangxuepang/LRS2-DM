@@ -13,10 +13,11 @@ To mitigate resolution limitations, the method incorporates cognitive-conditione
 
 ## 🧠 Key Contributions
 
-- **Cognitive-Conditioned Input (CCI):** Incorporates prior information (class and location embeddings) to enhance image-text alignment via ReMLP modules.
-- **Low-Level Super-Resolution Module (L²SR):** Utilizes diffusion-based priors (e.g., DALL·E, VQ-VAE-2) to produce high-fidelity reference images for guiding super-resolution tasks.
-- **Spatial Refinement Module (SRM):** Sharpens object-level features and enhances small object detection accuracy by refining spatial details.
-- **Multi-Loss Design:** Introduces a joint loss for diffusion model training and detection head regularization (L<sub>DM</sub> + L<sub>reg</sub>).
+Enhanced Image Clarity: Cognitive conditions and a low-level super-resolution module are integrated to address blurred ship features in low-resolution remote sensing images, with diffusion models enhancing resolution through task-specific textual prior knowledge.
+
+Improved Small Target Detection: A spatial refinement module compensates for missing texture and detail in small targets, refining features and improving detection accuracy through spatial structure transfer.
+
+Optimized Loss Module: An optimized loss function enhances network integration, mitigates noise from diffusion models, and adapts to various detection tasks, ensuring model stability.
 
 ## 📊 Result
 
