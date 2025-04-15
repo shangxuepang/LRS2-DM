@@ -4,7 +4,7 @@ The study focuses on addressing the challenge of small object detection in low-r
 # 🚢 LRS2-DM: Small Ship Target Detection in Low-Resolution Remote Sensing Images Based on Diffusion Models
 
 <p align="center">
-  <img src="LRS2-DM.png." width="90%"/>
+  <img src="LRS2-DM.png" width="90%"/>
 </p>
 
 ## 📌 Introduction
