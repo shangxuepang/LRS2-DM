@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -64,7 +63,7 @@ class DiffusionModel(nn.Module):
         noise = torch.randn_like(x0)
         xt = self.q_sample(x0, t, noise)
 
-        # 条件拼接：Zs 和 Zc 合并为条件图
+     
         if Zs is not None and Zc is not None:
             cond = Zs + Zc.view(B, Zc.shape[1], 1, 1).expand_as(Zs)
         elif Zs is not None:
