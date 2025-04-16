@@ -1,77 +1,67 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import math
+from torchvision import transforms
+import random
+from PIL import Image, ImageEnhance, ImageOps
+
+class RandomApplyEnhance:
+    def __init__(self, brightness=0.2, contrast=0.2, sharpness=0.2, color=0.2, probability=0.5):
+        self.brightness = brightness
+        self.contrast = contrast
+        self.sharpness = sharpness
+        self.color = color
+        self.prob = probability
+
+    def __call__(self, img):
+        if random.random() < self.prob:
+            img = ImageEnhance.Brightness(img).enhance(1 + random.uniform(-self.brightness, self.brightness))
+        if random.random() < self.prob:
+            img = ImageEnhance.Contrast(img).enhance(1 + random.uniform(-self.contrast, self.contrast))
+        if random.random() < self.prob:
+            img = ImageEnhance.Sharpness(img).enhance(1 + random.uniform(-self.sharpness, self.sharpness))
+        if random.random() < self.prob:
+            img = ImageEnhance.Color(img).enhance(1 + random.uniform(-self.color, self.color))
+        return img
+
+class RandomGaussianBlur:
+    def __init__(self, probability=0.3, radius_range=(0.1, 1.5)):
+        self.prob = probability
+        self.radius_range = radius_range
+
+    def __call__(self, img):
+        if random.random() < self.prob:
+            radius = random.uniform(*self.radius_range)
+            return img.filter(ImageFilter.GaussianBlur(radius))
+        return img
+
+class RandomSolarize:
+    def __init__(self, probability=0.2, threshold=192):
+        self.prob = probability
+        self.threshold = threshold
+
+    def __call__(self, img):
+        if random.random() < self.prob:
+            return ImageOps.solarize(img, self.threshold)
+        return img
 
 
-def make_beta_schedule(timesteps, start=1e-4, end=0.02):
-    return torch.linspace(start, end, timesteps)
-
-
-class SimpleDenoiseUNet(nn.Module):
-    def __init__(self, in_channels=3, cond_channels=512):
-        super().__init__()
-        self.encoder = nn.Sequential(
-            nn.Conv2d(in_channels + cond_channels, 64, 3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, 3, padding=1),
-            nn.ReLU()
-        )
-        self.middle = nn.Sequential(
-            nn.Conv2d(64, 64, 3, padding=1),
-            nn.ReLU()
-        )
-        self.decoder = nn.Sequential(
-            nn.Conv2d(64, 64, 3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(64, in_channels, 3, padding=1)
-        )
-
-    def forward(self, xt, cond):
-        x = torch.cat([xt, cond], dim=1)
-        x = self.encoder(x)
-        x = self.middle(x)
-        x = self.decoder(x)
-        return x
-
-
-class DiffusionModel(nn.Module):
-    def __init__(self, cfg, timesteps=1000):
-        super().__init__()
-        self.timesteps = timesteps
-        self.cfg = cfg
-        self.device = cfg.device
-
-        # beta schedule & derived params
-        betas = make_beta_schedule(timesteps).to(self.device)
-        alphas = 1.0 - betas
-        self.alphas_cumprod = torch.cumprod(alphas, dim=0)
-
-        self.model = SimpleDenoiseUNet(in_channels=3, cond_channels=512)
-
-    def q_sample(self, x0, t, noise=None):
-        if noise is None:
-            noise = torch.randn_like(x0)
-        sqrt_alpha_bar = self.alphas_cumprod[t].sqrt().view(-1, 1, 1, 1)
-        sqrt_one_minus = (1 - self.alphas_cumprod[t]).sqrt().view(-1, 1, 1, 1)
-        return sqrt_alpha_bar * x0 + sqrt_one_minus * noise
-
-    def forward(self, x0, Zs=None, Zc=None):
-        B = x0.size(0)
-        t = torch.randint(0, self.timesteps, (B,), device=self.device)
-
-        noise = torch.randn_like(x0)
-        xt = self.q_sample(x0, t, noise)
-
-        if Zs is not None and Zc is not None:
-            cond = Zs + Zc.view(B, Zc.shape[1], 1, 1).expand_as(Zs)
-        elif Zs is not None:
-            cond = Zs
-        elif Zc is not None:
-            cond = Zc.view(B, Zc.shape[1], 1, 1).expand(B, Zc.shape[1], x0.size(2), x0.size(3))
-        else:
-            cond = torch.zeros(B, 512, x0.size(2), x0.size(3)).to(self.device)
-
-        pred_noise = self.model(xt, cond)
-        return pred_noise, noise, t
-
+def get_transforms(mode='train'):
+    if mode == 'train':
+        return transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.Resize((560, 560)),
+            transforms.RandomCrop(512),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomRotation(20),
+            RandomApplyEnhance(0.3, 0.3, 0.3, 0.2, 0.7),
+            RandomGaussianBlur(probability=0.3),
+            RandomSolarize(probability=0.15),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        ])
+    else:
+        return transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.Resize((512, 512)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        ])
